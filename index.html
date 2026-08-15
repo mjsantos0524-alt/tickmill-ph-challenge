@@ -20,6 +20,8 @@
   </div>
 </nav>
 
+<div id="announcement-banner"></div>
+
 <header class="hero">
   <div class="container">
     <span class="hero-eyebrow">Quarterly Campaign · Prototype Demo</span>
@@ -50,21 +52,14 @@
         <span class="badge badge-gold">Performance-Based</span>
         <h3>🏆 ROI Trading Competition</h3>
         <p>Top 5 traders ranked by <strong>risk-adjusted ROI</strong> — not just raw returns — win cash and prizes.</p>
-        <ul>
-          <li>🥇 Champion — Travel Incentive Package (USD 1,200)</li>
-          <li>🥈 2nd Place — Laptop (USD 1,000)</li>
-          <li>🥉 3rd–5th Place — Cash (USD 300 / 200 / 200)</li>
-        </ul>
+        <ul id="hero-roi-list"><li class="loading-row">Loading…</li></ul>
       </div>
       <div class="card reward-card raffle">
         <span class="badge badge-green">Qualification-Based</span>
         <h3>🎟️ Grand Lucky Raffle</h3>
         <p>Every participant who completes the requirements gets an entry — plus bonus entries for referring friends.</p>
-        <ul>
-          <li>🏆 Grand Prize — iPhone 17 (USD 900)</li>
-          <li>🎁 4 Consolation Winners — USD 100 cash each</li>
-          <li>➕ +1 bonus entry for every friend you refer who qualifies</li>
-        </ul>
+        <ul id="hero-raffle-list"><li class="loading-row">Loading…</li></ul>
+        <ul><li>➕ +1 bonus entry for every friend you refer who qualifies</li></ul>
       </div>
     </div>
   </div>
@@ -152,28 +147,19 @@
   <div class="container">
     <div class="section-head">
       <span class="kicker">Prize Budget</span>
-      <h2>Total campaign prize pool: USD 4,200</h2>
+      <h2>Total campaign prize pool: <span id="total-prize-pool">—</span></h2>
     </div>
     <div class="grid grid-2">
       <div class="table-wrap">
         <table>
           <thead><tr><th>ROI Competition</th><th>Budget</th></tr></thead>
-          <tbody>
-            <tr><td>🥇 Travel Incentive</td><td>USD 1,200</td></tr>
-            <tr><td>🥈 Laptop</td><td>USD 1,000</td></tr>
-            <tr><td>🥉 3rd Place Cash</td><td>USD 300</td></tr>
-            <tr><td>4th Place Cash</td><td>USD 200</td></tr>
-            <tr><td>5th Place Cash</td><td>USD 200</td></tr>
-          </tbody>
+          <tbody id="budget-roi-body"><tr><td colspan="2" class="loading-row">Loading…</td></tr></tbody>
         </table>
       </div>
       <div class="table-wrap">
         <table>
           <thead><tr><th>Grand Lucky Raffle</th><th>Budget</th></tr></thead>
-          <tbody>
-            <tr><td>🏆 iPhone 17 (Grand Prize)</td><td>USD 900</td></tr>
-            <tr><td>🎁 4 Cash Winners</td><td>USD 400</td></tr>
-          </tbody>
+          <tbody id="budget-raffle-body"><tr><td colspan="2" class="loading-row">Loading…</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -237,5 +223,7 @@
     });
   });
 </script>
+<script src="js/prizes.js"></script>
+<script src="js/announcements.js"></script>
 </body>
 </html>

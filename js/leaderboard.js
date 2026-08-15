@@ -1,12 +1,11 @@
-const PRIZES = [
-  { label: '🥇 Champion', amount: 'USD 1,200 · Travel Package' },
-  { label: '🥈 2nd Place', amount: 'USD 1,000 · Laptop' },
-  { label: '🥉 3rd Place', amount: 'USD 300 Cash' },
-  { label: '4th Place', amount: 'USD 200 Cash' },
-  { label: '5th Place', amount: 'USD 200 Cash' },
-];
+async function loadRoiPrizes() {
+  const { data, error } = await supabaseClient.from('prizes').select('*').eq('category', 'roi').order('sort_order');
+  if (error || !data) return [];
+  return data.map(p => ({ label: `${p.emoji} ${p.label}`, amount: `USD ${Number(p.amount_usd).toLocaleString()} · ${p.description}` }));
+}
 
 async function loadLeaderboard() {
+  const PRIZES = await loadRoiPrizes();
   const { data, error } = await supabaseClient
     .from('leaderboard_entries')
     .select('trader_alias, account_type, roi_pct, risk_adjusted_score, max_drawdown_pct, weeks_active, lots_traded, is_qualified')

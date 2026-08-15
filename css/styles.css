@@ -333,6 +333,24 @@ tbody tr:hover { background: var(--paper-100); }
 .stat-tile .num { font-size: 2rem; font-weight: 800; color: var(--navy-800); }
 .stat-tile .lab { color: var(--ink-600); font-size: 0.85rem; margin-top: 4px; }
 
+/* ---------- Announcements ---------- */
+#announcement-banner:empty { display: none; }
+.announcement {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 12px 24px;
+  font-size: 0.9rem;
+  border-bottom: 1px solid var(--border);
+}
+.announcement + .announcement { border-top: 1px solid rgba(255,255,255,0.15); }
+.announcement-icon { font-size: 1rem; line-height: 1.4; }
+.announcement-body { color: inherit; opacity: 0.85; margin-left: 8px; font-weight: 400; }
+.announcement-update { background: #eaf1fb; color: #1f4e8c; }
+.announcement-important { background: #fbe6e4; color: #b23327; }
+.announcement-warning { background: #fff7e8; color: #8a5a06; }
+.announcement-promo { background: #f3e8fd; color: #6b2fa8; }
+
 /* ---------- Footer ---------- */
 .footer { background: var(--navy-950); color: #93a1b8; padding: 32px 0; font-size: 0.85rem; text-align: center; }
 .footer strong { color: #fff; }

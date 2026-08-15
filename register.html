@@ -20,6 +20,8 @@
   </div>
 </nav>
 
+<div id="announcement-banner"></div>
+
 <section class="section">
   <div class="container">
     <div class="section-head center" style="margin:0 auto 34px;">
@@ -48,6 +50,11 @@
           </select>
         </div>
         <div class="field">
+          <label for="trading_account_number">Trading account number</label>
+          <input type="text" id="trading_account_number" required placeholder="e.g. 12345678">
+          <div class="hint">Your Tickmill Classic/RAW account number — used to verify deposits and trading activity.</div>
+        </div>
+        <div class="field">
           <label for="referral_code">Referral code <span style="font-weight:400;color:var(--ink-400)">(optional)</span></label>
           <input type="text" id="referral_code" placeholder="e.g. MARCO2K">
           <div class="hint">Got invited by a friend? Enter their code — they'll earn a bonus raffle entry.</div>
@@ -74,5 +81,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/config.js"></script>
 <script src="js/register.js"></script>
+<script src="js/announcements.js"></script>
 </body>
 </html>

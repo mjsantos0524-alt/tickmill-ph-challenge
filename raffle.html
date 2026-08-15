@@ -20,6 +20,8 @@
   </div>
 </nav>
 
+<div id="announcement-banner"></div>
+
 <header class="hero" style="padding:48px 0;">
   <div class="container">
     <span class="hero-eyebrow">Grand Lucky Raffle</span>
@@ -30,17 +32,8 @@
 
 <section class="section">
   <div class="container">
-    <div class="grid grid-2" style="margin-bottom:32px;">
-      <div class="card">
-        <span class="badge badge-gold">Grand Prize</span>
-        <h3>🏆 iPhone 17</h3>
-        <p>Value: USD 900 · 1 winner</p>
-      </div>
-      <div class="card">
-        <span class="badge badge-green">Consolation Prizes</span>
-        <h3>🎁 Cash Prizes</h3>
-        <p>USD 100 each · 4 winners</p>
-      </div>
+    <div class="grid grid-2" style="margin-bottom:32px;" id="raffle-prize-cards">
+      <div class="card"><p class="loading-row">Loading prizes…</p></div>
     </div>
 
     <div class="section-head">
@@ -75,5 +68,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/config.js"></script>
 <script src="js/raffle.js"></script>
+<script src="js/announcements.js"></script>
 </body>
 </html>

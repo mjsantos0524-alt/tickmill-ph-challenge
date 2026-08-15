@@ -1,3 +1,17 @@
+async function loadRafflePrizes() {
+  const { data, error } = await supabaseClient.from('prizes').select('*').eq('category', 'raffle').order('sort_order');
+  const wrap = document.getElementById('raffle-prize-cards');
+  if (error || !data || !data.length) { wrap.innerHTML = '<div class="card"><p>Prizes unavailable.</p></div>'; return; }
+
+  wrap.innerHTML = data.map((p, i) => `
+    <div class="card">
+      <span class="badge ${i === 0 ? 'badge-gold' : 'badge-green'}">${p.label}</span>
+      <h3>${p.emoji} ${p.description}</h3>
+      <p>${p.winner_count > 1 ? `USD ${Number(p.amount_usd).toLocaleString()} each · ${p.winner_count} winners` : `Value: USD ${Number(p.amount_usd).toLocaleString()} · 1 winner`}</p>
+    </div>
+  `).join('');
+}
+
 async function loadRaffleStats() {
   const { data, error } = await supabaseClient
     .from('raffle_entries')
@@ -19,4 +33,5 @@ async function loadRaffleStats() {
   tiles[2].textContent = referral;
 }
 
+loadRafflePrizes();
 loadRaffleStats();

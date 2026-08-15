@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin — Tickmill PH Trading Challenge</title>
+<link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="css/admin.css">
+<meta name="robots" content="noindex, nofollow">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="container">
+    <a href="index.html" class="nav-brand"><span class="dot">●</span> Tickmill PH Challenge</a>
+    <ul class="nav-links">
+      <li><a href="index.html">Overview</a></li>
+      <li><a href="leaderboard.html">Leaderboard</a></li>
+      <li><a href="raffle.html">Raffle</a></li>
+      <li><a href="register.html">Register</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- Login screen -->
+<section class="section" id="login-screen">
+  <div class="container">
+    <div class="card form-card">
+      <h2 class="center mt-0">Admin Login</h2>
+      <div id="login-msg" class="form-msg"></div>
+      <form id="login-form">
+        <div class="field">
+          <label for="login-email">Email</label>
+          <input type="email" id="login-email" required>
+        </div>
+        <div class="field">
+          <label for="login-password">Password</label>
+          <input type="password" id="login-password" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Log In</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- Admin panel (hidden until logged in) -->
+<div id="admin-panel" style="display:none;">
+  <header class="hero" style="padding:32px 0;">
+    <div class="container" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+      <div>
+        <span class="hero-eyebrow">Admin</span>
+        <h1 style="font-size:1.6rem; margin:0;">Campaign Control Panel</h1>
+      </div>
+      <div style="display:flex; align-items:center; gap:14px;">
+        <span id="admin-email" style="color:#b9c4d6; font-size:0.9rem;"></span>
+        <button class="btn btn-ghost" id="logout-btn">Log Out</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="admin-tabs" id="admin-tabs">
+      <button class="admin-tab active" data-tab="registrants">Registrants</button>
+      <button class="admin-tab" data-tab="leaderboard">Leaderboard</button>
+      <button class="admin-tab" data-tab="raffle">Raffle</button>
+      <button class="admin-tab" data-tab="prizes">Prizes</button>
+      <button class="admin-tab" data-tab="announcements">Announcements</button>
+    </div>
+
+    <!-- Registrants -->
+    <div class="admin-panel-section" id="panel-registrants">
+      <div class="section-head"><h2>Registrants</h2><p>Everyone who has signed up. Delete removes their leaderboard/raffle records too.</p></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Name</th><th>Email</th><th>Account</th><th>Account #</th><th>Referral Code</th><th>Referred By</th><th>Joined</th><th></th></tr></thead>
+          <tbody id="registrants-body"><tr><td colspan="8" class="loading-row">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Leaderboard -->
+    <div class="admin-panel-section" id="panel-leaderboard" style="display:none;">
+      <div class="section-head"><h2>Leaderboard Entries</h2><p>Verified trading performance. Edited values recalculate ROI / risk-adjusted score / qualification automatically.</p></div>
+
+      <div class="card" style="margin-bottom:24px;">
+        <h3 class="mt-0">Add Entry</h3>
+        <form id="lb-add-form" class="admin-form-row">
+          <select id="lb-registrant" title="Link to registrant (optional)">
+            <option value="">— no registrant link —</option>
+          </select>
+          <input type="text" id="lb-alias" placeholder="Trader alias" required>
+          <select id="lb-account-type"><option value="classic">Classic</option><option value="raw">RAW</option></select>
+          <input type="number" id="lb-deposit" placeholder="Deposit" value="500" step="0.01" required>
+          <input type="number" id="lb-profit" placeholder="Net profit" value="0" step="0.01" required>
+          <input type="number" id="lb-drawdown" placeholder="Drawdown %" value="0" step="0.01" required>
+          <input type="number" id="lb-lots" placeholder="Lots" value="5" step="0.01" required>
+          <input type="number" id="lb-weeks" placeholder="Weeks active" value="3" step="1" required>
+          <button type="submit" class="btn btn-primary">Add</button>
+        </form>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Alias</th><th>Type</th><th>Deposit</th><th>Profit</th><th>Drawdown %</th><th>Lots</th><th>Weeks</th><th>ROI</th><th>Score</th><th>Qualified</th><th></th></tr></thead>
+          <tbody id="lb-body"><tr><td colspan="11" class="loading-row">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Raffle -->
+    <div class="admin-panel-section" id="panel-raffle" style="display:none;">
+      <div class="section-head"><h2>Raffle Entries</h2><p>Qualification and referral entries are auto-granted. Use this to award a manual bonus entry.</p></div>
+
+      <div class="card" style="margin-bottom:24px;">
+        <h3 class="mt-0">Award Bonus Entry</h3>
+        <form id="raffle-add-form" class="admin-form-row">
+          <select id="raffle-registrant" required>
+            <option value="">— select registrant —</option>
+          </select>
+          <input type="number" id="raffle-count" placeholder="Entry count" value="1" min="1" step="1" required>
+          <button type="submit" class="btn btn-primary">Award</button>
+        </form>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Registrant</th><th>Source</th><th>Entries</th><th>Granted</th><th></th></tr></thead>
+          <tbody id="raffle-body"><tr><td colspan="5" class="loading-row">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Prizes -->
+    <div class="admin-panel-section" id="panel-prizes" style="display:none;">
+      <div class="section-head"><h2>Prize Details</h2><p>Edits here update the Overview, Leaderboard, and Raffle pages immediately — no code changes needed.</p></div>
+      <h3>ROI Competition</h3>
+      <div class="table-wrap" style="margin-bottom:28px;">
+        <table>
+          <thead><tr><th>Order</th><th>Emoji</th><th>Label</th><th>Description</th><th>Amount USD</th><th>Winners</th><th></th></tr></thead>
+          <tbody id="prizes-roi-body"><tr><td colspan="7" class="loading-row">Loading…</td></tr></tbody>
+        </table>
+      </div>
+      <h3>Grand Lucky Raffle</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Order</th><th>Emoji</th><th>Label</th><th>Description</th><th>Amount USD</th><th>Winners</th><th></th></tr></thead>
+          <tbody id="prizes-raffle-body"><tr><td colspan="7" class="loading-row">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Announcements -->
+    <div class="admin-panel-section" id="panel-announcements" style="display:none;">
+      <div class="section-head"><h2>Announcements</h2><p>Shown as a banner at the top of every public page (Overview, Leaderboard, Raffle, Register). Only active announcements are visible to visitors.</p></div>
+
+      <div class="card" style="margin-bottom:24px;">
+        <h3 class="mt-0">New Announcement</h3>
+        <form id="ann-add-form" class="admin-form-row">
+          <input type="text" id="ann-title" placeholder="Title" required style="width:220px;">
+          <input type="text" id="ann-body" placeholder="Details (optional)" style="width:280px;">
+          <select id="ann-severity">
+            <option value="update">Update</option>
+            <option value="important">Important</option>
+            <option value="warning">Warning</option>
+            <option value="promo">Promo</option>
+          </select>
+          <button type="submit" class="btn btn-primary">Post</button>
+        </form>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Title</th><th>Details</th><th>Severity</th><th>Active</th><th>Posted</th><th></th></tr></thead>
+          <tbody id="ann-table-body"><tr><td colspan="6" class="loading-row">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div style="height:60px"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/config.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>
