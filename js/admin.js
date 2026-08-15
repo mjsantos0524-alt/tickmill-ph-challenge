@@ -58,6 +58,7 @@ function loadAll() {
   loadRaffle();
   loadPrizes();
   loadAnnouncementsAdmin();
+  loadCampaignSettings();
 }
 
 // ---------- Registrants ----------
@@ -340,6 +341,37 @@ document.getElementById('ann-table-body').addEventListener('click', async (e) =>
     if (error) { alert(error.message); loadAnnouncementsAdmin(); return; }
     loadAnnouncementsAdmin();
   }
+});
+
+// ---------- Settings ----------
+function toLocalDatetimeInputValue(date) {
+  const pad = n => String(n).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
+async function loadCampaignSettings() {
+  const { data, error } = await supabaseClient.from('campaign_settings').select('campaign_end_at').eq('id', 1).single();
+  if (error || !data) return;
+  document.getElementById('campaign-end').value = toLocalDatetimeInputValue(new Date(data.campaign_end_at));
+}
+
+function showSettingsMsg(text, type) {
+  const el = document.getElementById('settings-msg');
+  el.textContent = text;
+  el.className = 'form-msg ' + (type || '');
+}
+
+document.getElementById('settings-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const localValue = document.getElementById('campaign-end').value;
+  const campaign_end_at = new Date(localValue).toISOString();
+
+  const { error } = await supabaseClient.from('campaign_settings')
+    .update({ campaign_end_at, updated_at: new Date().toISOString() })
+    .eq('id', 1);
+
+  if (error) { showSettingsMsg(error.message, 'error'); return; }
+  showSettingsMsg('Saved — the Overview page countdown will update.', 'success');
 });
 
 checkSession();

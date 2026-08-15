@@ -203,7 +203,10 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="js/config.js"></script>
 <script>
+  let CAMPAIGN_END = null;
+
   function tick() {
+    if (!CAMPAIGN_END) return;
     const now = new Date();
     let diff = Math.max(0, CAMPAIGN_END - now);
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
@@ -215,7 +218,15 @@
     document.getElementById('cd-mins').textContent = String(mins).padStart(2, '0');
     document.getElementById('cd-secs').textContent = String(secs).padStart(2, '0');
   }
-  tick();
+
+  async function loadCampaignEnd() {
+    const { data, error } = await supabaseClient.from('campaign_settings').select('campaign_end_at').eq('id', 1).single();
+    if (error || !data) return;
+    CAMPAIGN_END = new Date(data.campaign_end_at);
+    tick();
+  }
+
+  loadCampaignEnd();
   setInterval(tick, 1000);
 
   document.querySelectorAll('.faq-q').forEach(btn => {

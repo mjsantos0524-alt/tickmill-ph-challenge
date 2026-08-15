@@ -65,6 +65,7 @@
       <button class="admin-tab" data-tab="raffle">Raffle</button>
       <button class="admin-tab" data-tab="prizes">Prizes</button>
       <button class="admin-tab" data-tab="announcements">Announcements</button>
+      <button class="admin-tab" data-tab="settings">Settings</button>
     </div>
 
     <!-- Registrants -->
@@ -197,6 +198,23 @@
           <thead><tr><th>Title</th><th>Details</th><th>Severity</th><th>Active</th><th>Posted</th><th></th></tr></thead>
           <tbody id="ann-table-body"><tr><td colspan="6" class="loading-row">Loading…</td></tr></tbody>
         </table>
+      </div>
+    </div>
+
+    <!-- Settings -->
+    <div class="admin-panel-section" id="panel-settings" style="display:none;">
+      <div class="section-head"><h2>Campaign Settings</h2><p>Controls the countdown timer shown on the Overview page.</p></div>
+
+      <div class="card form-card" style="margin:0;">
+        <div id="settings-msg" class="form-msg"></div>
+        <form id="settings-form">
+          <div class="field">
+            <label for="campaign-end">Campaign end date &amp; time</label>
+            <input type="datetime-local" id="campaign-end" required>
+            <div class="hint">Shown to visitors in their own local timezone.</div>
+          </div>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </form>
       </div>
     </div>
   </div>
