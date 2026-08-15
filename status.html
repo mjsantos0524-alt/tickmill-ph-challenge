@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Status — Tickmill PH Trading Challenge</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="container">
+    <a href="index.html" class="nav-brand"><span class="dot">●</span> Tickmill PH Challenge</a>
+    <ul class="nav-links">
+      <li><a href="index.html">Overview</a></li>
+      <li><a href="leaderboard.html">Leaderboard</a></li>
+      <li><a href="raffle.html">Raffle</a></li>
+      <li><a href="status.html" class="active">My Status</a></li>
+      <li><a href="register.html">Register</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div id="announcement-banner"></div>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head center" style="margin:0 auto 34px;">
+      <span class="kicker">Check Your Progress</span>
+      <h2>My Status</h2>
+      <p>Enter the email you registered with to see your qualification progress, ROI ranking, and raffle entries.</p>
+    </div>
+
+    <div class="card form-card">
+      <form id="status-form">
+        <div class="field">
+          <label for="status-email">Email</label>
+          <input type="email" id="status-email" required placeholder="juan@example.com">
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" id="status-submit-btn">Check Status →</button>
+      </form>
+      <div id="status-msg" class="form-msg"></div>
+    </div>
+
+    <div id="status-result" style="max-width:640px; margin:28px auto 0; display:none;">
+
+      <div class="grid grid-3" style="margin-bottom:20px;">
+        <div class="stat-tile"><div class="num" id="s-lots">—</div><div class="lab">Lots Traded (of 5)</div></div>
+        <div class="stat-tile"><div class="num" id="s-weeks">—</div><div class="lab">Weeks Active (of 3)</div></div>
+        <div class="stat-tile"><div class="num" id="s-entries">—</div><div class="lab">Raffle Entries</div></div>
+      </div>
+
+      <div class="card" style="margin-bottom:16px;">
+        <h3 class="mt-0">Registration Details</h3>
+        <table>
+          <tbody>
+            <tr><td>Name</td><td id="s-name">—</td></tr>
+            <tr><td>Account Type</td><td id="s-account-type">—</td></tr>
+            <tr><td>Trading Account #</td><td id="s-account-number">—</td></tr>
+            <tr><td>Referral Code</td><td id="s-referral-code">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card" id="s-leaderboard-card">
+        <h3 class="mt-0">ROI Competition</h3>
+        <p id="s-leaderboard-text">—</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <p><strong>Tickmill Philippines Exclusive Trading Challenge &amp; Rewards Program</strong> — Prototype demo. Status shown reflects sample data recorded by campaign admins.</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/config.js"></script>
+<script src="js/status.js"></script>
+<script src="js/announcements.js"></script>
+</body>
+</html>
