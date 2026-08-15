@@ -69,3 +69,15 @@ table input, table select {
 .btn-danger:hover { background: #f6d2ce; }
 .btn-save { background: var(--green-500); color: #fff; border: none; }
 .btn-save:hover { opacity: 0.9; }
+
+.lb-history-row td { background: var(--paper-100); padding: 14px 16px; }
+.history-list { display: flex; flex-direction: column; gap: 10px; }
+.history-entry {
+  background: var(--paper-0);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+.history-meta { font-size: 0.76rem; color: var(--ink-400); font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 6px; }
+.history-entry ul { margin: 0; padding-left: 18px; font-size: 0.86rem; }
+.history-entry li { margin-bottom: 2px; }

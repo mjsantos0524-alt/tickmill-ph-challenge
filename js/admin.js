@@ -103,7 +103,7 @@ document.getElementById('registrants-body').addEventListener('click', async (e) 
 async function loadLeaderboard() {
   const { data, error } = await supabaseClient.from('leaderboard_entries').select('*').order('risk_adjusted_score', { ascending: false });
   const body = document.getElementById('lb-body');
-  if (error) { body.innerHTML = `<tr><td colspan="11">Error: ${esc(error.message)}</td></tr>`; return; }
+  if (error) { body.innerHTML = `<tr><td colspan="12">Error: ${esc(error.message)}</td></tr>`; return; }
 
   body.innerHTML = data.length ? data.map(row => `
     <tr data-id="${row.id}">
@@ -121,8 +121,54 @@ async function loadLeaderboard() {
         <button class="btn btn-sm btn-save" data-action="save-lb">Save</button>
         <button class="btn btn-sm btn-danger" data-action="del-lb">Delete</button>
       </td>
+      <td><button class="btn btn-sm" data-action="history-lb">History</button></td>
     </tr>
-  `).join('') : '<tr><td colspan="11" class="loading-row">No leaderboard entries yet.</td></tr>';
+  `).join('') : '<tr><td colspan="12" class="loading-row">No leaderboard entries yet.</td></tr>';
+}
+
+const LB_FIELD_LABELS = {
+  trader_alias: 'Alias',
+  account_type: 'Account Type',
+  initial_deposit: 'Deposit',
+  net_profit: 'Net Profit',
+  max_drawdown_pct: 'Drawdown %',
+  lots_traded: 'Lots',
+  weeks_active: 'Weeks Active',
+  registrant_id: 'Registrant',
+};
+
+async function toggleLbHistory(tr, id) {
+  const existing = tr.nextElementSibling;
+  if (existing && existing.classList.contains('lb-history-row')) {
+    existing.remove();
+    return;
+  }
+  document.querySelectorAll('.lb-history-row').forEach(r => r.remove());
+
+  const historyRow = document.createElement('tr');
+  historyRow.className = 'lb-history-row';
+  historyRow.innerHTML = `<td colspan="12" class="loading-row">Loading history…</td>`;
+  tr.after(historyRow);
+
+  const { data, error } = await supabaseClient
+    .from('leaderboard_entry_history')
+    .select('*')
+    .eq('leaderboard_entry_id', id)
+    .order('changed_at', { ascending: false });
+
+  if (error) { historyRow.innerHTML = `<td colspan="12">Error: ${esc(error.message)}</td>`; return; }
+  if (!data.length) { historyRow.innerHTML = `<td colspan="12" class="loading-row">No edits recorded for this entry yet.</td>`; return; }
+
+  historyRow.innerHTML = `<td colspan="12"><div class="history-list">${data.map(h => {
+    const changes = Object.keys(LB_FIELD_LABELS)
+      .filter(k => JSON.stringify(h.old_data[k]) !== JSON.stringify(h.new_data[k]))
+      .map(k => `<li><strong>${LB_FIELD_LABELS[k]}:</strong> ${esc(h.old_data[k])} → ${esc(h.new_data[k])}</li>`)
+      .join('');
+    return `<div class="history-entry">
+      <div class="history-meta">${new Date(h.changed_at).toLocaleString()} · by ${esc(h.changed_by)}</div>
+      <ul>${changes || '<li>No tracked fields changed</li>'}</ul>
+    </div>`;
+  }).join('')}</div></td>`;
 }
 
 document.getElementById('lb-body').addEventListener('click', async (e) => {
@@ -130,6 +176,11 @@ document.getElementById('lb-body').addEventListener('click', async (e) => {
   if (!action) return;
   const tr = e.target.closest('tr');
   const id = tr.dataset.id;
+
+  if (action === 'history-lb') {
+    await toggleLbHistory(tr, id);
+    return;
+  }
 
   if (action === 'del-lb') {
     if (!confirm('Delete this leaderboard entry?')) return;
