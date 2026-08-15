@@ -37,11 +37,16 @@
 
 .field-mini { display: flex; flex-direction: column; gap: 4px; }
 .field-mini label {
-  font-size: 0.72rem;
+  font-size: 0.62rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.03em;
   color: var(--ink-400);
+}
+
+.admin-form-row { align-items: flex-end; }
+.admin-form-row .btn-add {
+  padding: 11px 40px;
 }
 
 table input, table select {

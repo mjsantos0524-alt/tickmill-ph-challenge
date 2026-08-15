@@ -52,6 +52,8 @@ a { color: inherit; }
   align-items: center;
   justify-content: space-between;
   height: 64px;
+  flex-wrap: wrap;
+  gap: 8px 0;
 }
 .nav-brand {
   font-weight: 800;
@@ -82,6 +84,12 @@ a { color: inherit; }
 }
 .nav-links a:hover { background: rgba(255,255,255,0.08); color: #fff; }
 .nav-links a.active { background: var(--gold-500); color: var(--navy-950); }
+
+@media (max-width: 720px) {
+  .nav .container { height: auto; padding-top: 10px; padding-bottom: 10px; }
+  .nav-links { flex-wrap: wrap; gap: 2px; width: 100%; justify-content: flex-start; }
+  .nav-links a { padding: 6px 10px; font-size: 0.85rem; }
+}
 
 /* ---------- Hero ---------- */
 .hero {
