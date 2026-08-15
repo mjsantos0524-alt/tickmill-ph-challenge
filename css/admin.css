@@ -35,6 +35,15 @@
 .admin-form-row input[type="number"] { width: 110px; }
 .admin-form-row input[type="text"] { width: 160px; }
 
+.field-mini { display: flex; flex-direction: column; gap: 4px; }
+.field-mini label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--ink-400);
+}
+
 table input, table select {
   padding: 6px 8px;
   border: 1px solid var(--border);

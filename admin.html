@@ -85,16 +85,40 @@
       <div class="card" style="margin-bottom:24px;">
         <h3 class="mt-0">Add Entry</h3>
         <form id="lb-add-form" class="admin-form-row">
-          <select id="lb-registrant" title="Link to registrant (optional)">
-            <option value="">— no registrant link —</option>
-          </select>
-          <input type="text" id="lb-alias" placeholder="Trader alias" required>
-          <select id="lb-account-type"><option value="classic">Classic</option><option value="raw">RAW</option></select>
-          <input type="number" id="lb-deposit" placeholder="Deposit" value="500" step="0.01" required>
-          <input type="number" id="lb-profit" placeholder="Net profit" value="0" step="0.01" required>
-          <input type="number" id="lb-drawdown" placeholder="Drawdown %" value="0" step="0.01" required>
-          <input type="number" id="lb-lots" placeholder="Lots" value="5" step="0.01" required>
-          <input type="number" id="lb-weeks" placeholder="Weeks active" value="3" step="1" required>
+          <div class="field-mini">
+            <label for="lb-registrant">Registrant</label>
+            <select id="lb-registrant" title="Link to registrant (optional)">
+              <option value="">— no registrant link —</option>
+            </select>
+          </div>
+          <div class="field-mini">
+            <label for="lb-alias">Trader Alias</label>
+            <input type="text" id="lb-alias" placeholder="Trader alias" required>
+          </div>
+          <div class="field-mini">
+            <label for="lb-account-type">Account Type</label>
+            <select id="lb-account-type"><option value="classic">Classic</option><option value="raw">RAW</option></select>
+          </div>
+          <div class="field-mini">
+            <label for="lb-deposit">Deposit (USD)</label>
+            <input type="number" id="lb-deposit" placeholder="Deposit" value="500" step="0.01" required>
+          </div>
+          <div class="field-mini">
+            <label for="lb-profit">Net Profit (USD)</label>
+            <input type="number" id="lb-profit" placeholder="Net profit" value="0" step="0.01" required>
+          </div>
+          <div class="field-mini">
+            <label for="lb-drawdown">Max Drawdown %</label>
+            <input type="number" id="lb-drawdown" placeholder="Drawdown %" value="0" step="0.01" required>
+          </div>
+          <div class="field-mini">
+            <label for="lb-lots">Lots Traded</label>
+            <input type="number" id="lb-lots" placeholder="Lots" value="5" step="0.01" required>
+          </div>
+          <div class="field-mini">
+            <label for="lb-weeks">Weeks Active</label>
+            <input type="number" id="lb-weeks" placeholder="Weeks active" value="3" step="1" required>
+          </div>
           <button type="submit" class="btn btn-primary">Add</button>
         </form>
       </div>
