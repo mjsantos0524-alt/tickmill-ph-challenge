@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Leaderboard — Tickmill PH Trading Challenge</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="container">
+    <a href="index.html" class="nav-brand"><span class="dot">●</span> Tickmill PH Challenge</a>
+    <ul class="nav-links">
+      <li><a href="index.html">Overview</a></li>
+      <li><a href="leaderboard.html" class="active">Leaderboard</a></li>
+      <li><a href="raffle.html">Raffle</a></li>
+      <li><a href="register.html">Register</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero" style="padding:48px 0;">
+  <div class="container">
+    <span class="hero-eyebrow">ROI Trading Competition</span>
+    <h1>Live Leaderboard</h1>
+    <p class="lead">Top 5 traders ranked by risk-adjusted ROI. Rankings update as verified trading data is recorded.</p>
+  </div>
+</header>
+
+<section class="section">
+  <div class="container">
+    <div class="callout" style="margin-bottom:32px;">
+      <span class="icon">⚖️</span>
+      <div>
+        <h4>Risk-Adjusted Score formula</h4>
+        <p><code>Score = ROI% ÷ (1 + Max Drawdown% ÷ 10)</code> — a trader who took a huge drawdown to squeeze out a similar ROI ranks lower than one who got there with steady, controlled risk. Only entries meeting the spread-out trading requirement (5+ lots across 3+ distinct weeks) are eligible.</p>
+      </div>
+    </div>
+
+    <div class="section-head">
+      <span class="kicker">Top 5</span>
+      <h2>Qualified Ranking</h2>
+    </div>
+
+    <div id="lb-list">
+      <div class="loading-row">Loading leaderboard…</div>
+    </div>
+
+    <div style="height:36px"></div>
+
+    <div class="section-head">
+      <span class="kicker">Not Yet Ranked</span>
+      <h2>Below the cutoff</h2>
+      <p>These participants haven't yet met the eligibility bar (5+ lots across 3+ separate weeks, positive verified performance).</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Trader</th><th>ROI %</th><th>Weeks Active</th><th>Why not ranked</th></tr></thead>
+        <tbody id="unqualified-body">
+          <tr><td colspan="4" class="loading-row">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <p><strong>Tickmill Philippines Exclusive Trading Challenge &amp; Rewards Program</strong> — Prototype demo. Leaderboard data shown is sample data, not live trading records.</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="js/config.js"></script>
+<script src="js/leaderboard.js"></script>
+</body>
+</html>
