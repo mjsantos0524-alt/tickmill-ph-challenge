@@ -309,6 +309,24 @@ tbody tr:hover { background: var(--paper-100); }
 }
 .field input:focus, .field select:focus { outline: 2px solid var(--gold-500); outline-offset: 1px; }
 .field .hint { color: var(--ink-400); font-size: 0.78rem; margin-top: 5px; }
+
+.password-input-wrap { position: relative; }
+.password-input-wrap input { padding-right: 42px; }
+.password-toggle {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 6px 8px;
+  line-height: 1;
+  opacity: 0.55;
+  border-radius: 6px;
+}
+.password-toggle:hover { opacity: 0.9; background: var(--paper-100); }
 .form-msg { padding: 12px 14px; border-radius: 8px; font-size: 0.9rem; margin-bottom: 16px; display: none; }
 .form-msg.error { display: block; background: #fbe6e4; color: #b23327; }
 .form-msg.success { display: block; background: #e2f7ee; color: #0e7a4c; }

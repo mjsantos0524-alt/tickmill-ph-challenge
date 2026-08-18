@@ -52,12 +52,18 @@
       <form id="set-password-form">
         <div class="field">
           <label for="new-password">New password</label>
-          <input type="password" id="new-password" required minlength="8">
+          <div class="password-input-wrap">
+            <input type="password" id="new-password" required minlength="8">
+            <button type="button" class="password-toggle" data-target="new-password" aria-label="Show password">👁</button>
+          </div>
           <div class="hint">At least 8 characters.</div>
         </div>
         <div class="field">
           <label for="confirm-password">Confirm password</label>
-          <input type="password" id="confirm-password" required minlength="8">
+          <div class="password-input-wrap">
+            <input type="password" id="confirm-password" required minlength="8">
+            <button type="button" class="password-toggle" data-target="confirm-password" aria-label="Show password">👁</button>
+          </div>
         </div>
         <button type="submit" class="btn btn-primary btn-block" id="set-password-btn">Set Password &amp; Continue</button>
       </form>
