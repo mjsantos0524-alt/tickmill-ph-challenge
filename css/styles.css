@@ -309,6 +309,18 @@ tbody tr:hover { background: var(--paper-100); }
 }
 .field input:focus, .field select:focus { outline: 2px solid var(--gold-500); outline-offset: 1px; }
 .field .hint { color: var(--ink-400); font-size: 0.78rem; margin-top: 5px; }
+.field .fixed-value {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  background: var(--paper-100);
+  color: var(--ink-600);
+}
 
 .password-input-wrap { position: relative; }
 .password-input-wrap input { padding-right: 42px; }
@@ -382,6 +394,15 @@ tbody tr:hover { background: var(--paper-100); }
 .announcement-important { background: #fbe6e4; color: #b23327; }
 .announcement-warning { background: #fff7e8; color: #8a5a06; }
 .announcement-promo { background: #f3e8fd; color: #6b2fa8; }
+
+/* ---------- My Status cheer message ---------- */
+.status-cheer {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--navy-800);
+  margin: 0 0 8px !important;
+}
+.status-cheer-success { color: var(--green-500); }
 
 /* ---------- Footer ---------- */
 .footer { background: var(--navy-950); color: #93a1b8; padding: 32px 0; font-size: 0.85rem; text-align: center; }

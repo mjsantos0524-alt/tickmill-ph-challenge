@@ -30,7 +30,7 @@ document.getElementById('status-form').addEventListener('submit', async (e) => {
   }
 
   document.getElementById('s-name').textContent = row.full_name;
-  document.getElementById('s-account-type').textContent = row.account_type === 'raw' ? 'RAW' : 'Classic';
+  document.getElementById('s-account-type').textContent = 'Classic';
   document.getElementById('s-account-number').textContent = (row.trading_account_numbers && row.trading_account_numbers.length) ? row.trading_account_numbers.join(', ') : '—';
 
   document.getElementById('s-lots').textContent = row.has_leaderboard_entry ? Number(row.lots_traded).toFixed(1) : '0';
@@ -38,16 +38,18 @@ document.getElementById('status-form').addEventListener('submit', async (e) => {
   document.getElementById('s-entries').textContent = row.raffle_entry_count;
 
   const lbText = document.getElementById('s-leaderboard-text');
-  if (!row.has_leaderboard_entry) {
-    lbText.innerHTML = 'Your trading activity hasn\'t been recorded by campaign admins yet. Once your deposit and trades are verified, your ROI and ranking will show up here.';
-  } else if (row.is_qualified) {
-    lbText.innerHTML = `✅ <strong>Qualified.</strong> ROI: ${row.roi_pct}% · Drawdown: ${row.max_drawdown_pct}% · Risk-Adjusted Score: <strong>${row.risk_adjusted_score}</strong>` +
-      (row.roi_rank ? ` · Current rank: <strong>#${row.roi_rank}</strong>` : ' · Outside the current Top 5');
+  if (row.is_qualified) {
+    lbText.innerHTML = `<p class="status-cheer status-cheer-success">🎉 Huge congratulations on making the cut! You're crushing it!</p>
+      <p>✅ <strong>Qualified.</strong> ROI: ${row.roi_pct}% · Drawdown: ${row.max_drawdown_pct}% · Risk-Adjusted Score: <strong>${row.risk_adjusted_score}</strong>${row.roi_rank ? ` · Current rank: <strong>#${row.roi_rank}</strong>` : ' · Outside the current Top 5'}</p>`;
+  } else if (!row.has_leaderboard_entry) {
+    lbText.innerHTML = `<p class="status-cheer">💪 You're almost there. You can do this!</p>
+      <p>Your trading activity hasn't been recorded by campaign admins yet. Once your deposit and trades are verified, your ROI and ranking will show up here.</p>`;
   } else {
     const reasons = [];
     if (Number(row.lots_traded) < 5) reasons.push('under 5 lots traded');
     if (row.weeks_active < 3) reasons.push('not yet spread across 3+ weeks');
-    lbText.innerHTML = `⏳ <strong>Not yet qualified</strong> — ${reasons.join(', ') || 'requirements not yet met'}. ROI so far: ${row.roi_pct}%.`;
+    lbText.innerHTML = `<p class="status-cheer">💪 You're almost there. You can do this!</p>
+      <p>⏳ <strong>Not yet qualified</strong> — ${reasons.join(', ') || 'requirements not yet met'}. ROI so far: ${row.roi_pct}%.</p>`;
   }
 
   document.getElementById('status-result').style.display = 'block';

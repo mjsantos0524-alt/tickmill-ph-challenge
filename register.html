@@ -43,16 +43,14 @@
           <input type="email" id="email" required placeholder="juan@example.com">
         </div>
         <div class="field">
-          <label for="account_type">Account type</label>
-          <select id="account_type" required>
-            <option value="classic">Classic Account</option>
-            <option value="raw">RAW Account</option>
-          </select>
+          <label>Account type</label>
+          <div class="fixed-value">Classic Account <span class="badge badge-navy">Required</span></div>
+          <div class="hint">This campaign is open to Tickmill Classic Account holders only.</div>
         </div>
         <div class="field">
           <label for="trading_account_number">Trading account number</label>
           <input type="text" id="trading_account_number" required placeholder="e.g. 12345678">
-          <div class="hint">Your Tickmill Classic/RAW account number — used to verify deposits and trading activity.</div>
+          <div class="hint">Your Tickmill Classic account number — used to verify deposits and trading activity.</div>
         </div>
         <div class="field">
           <div id="extra-accounts"></div>

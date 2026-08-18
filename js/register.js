@@ -47,13 +47,11 @@ document.getElementById('reg-form').addEventListener('submit', async (e) => {
 
   const full_name = document.getElementById('full_name').value.trim();
   const email = document.getElementById('email').value.trim();
-  const account_type = document.getElementById('account_type').value;
   const trading_account_numbers = collectAccountNumbers();
 
   const { error } = await supabaseClient.rpc('register_participant', {
     p_full_name: full_name,
     p_email: email,
-    p_account_type: account_type,
     p_trading_account_numbers: trading_account_numbers,
   });
 
