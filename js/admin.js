@@ -548,10 +548,9 @@ document.getElementById('admin-add-form').addEventListener('submit', async (e) =
   const full_name = document.getElementById('admin-name').value.trim();
   const email = document.getElementById('admin-email').value.trim();
   const password = document.getElementById('admin-password').value;
-  const role = document.getElementById('admin-role').value;
 
   const { data, error } = await supabaseClient.functions.invoke('create-admin', {
-    body: { full_name, email, password, role },
+    body: { full_name, email, password },
   });
 
   btn.disabled = false;
@@ -575,7 +574,6 @@ document.getElementById('admin-add-form').addEventListener('submit', async (e) =
 
   showAdminAddMsg('Admin created.', 'success');
   e.target.reset();
-  document.getElementById('admin-role').value = 'admin';
   loadAdmins();
 });
 
