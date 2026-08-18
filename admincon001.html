@@ -247,9 +247,13 @@
           <input type="text" id="admin-name" placeholder="Full name" required style="width:180px;">
           <input type="email" id="admin-email" placeholder="Email" required style="width:200px;">
           <input type="password" id="admin-password" placeholder="Temp password (min 8 chars)" required minlength="8" style="width:200px;">
+          <select id="admin-role">
+            <option value="admin">Admin</option>
+            <option value="super_admin" disabled title="Locked: only one Super Admin can ever exist">Super Admin (locked)</option>
+          </select>
           <button type="submit" class="btn btn-primary" id="admin-add-btn">Create</button>
         </form>
-        <div class="hint" style="margin-top:8px;">New admins are always regular Admins — this account is permanently the only Super Admin.</div>
+        <div class="hint" style="margin-top:8px;">Super Admin is locked — this account is permanently the only one. New admins are always created as regular Admins, regardless of what's selected here.</div>
       </div>
 
       <div class="table-wrap">
