@@ -312,7 +312,7 @@ tbody tr:hover { background: var(--paper-100); }
 .field .fixed-value {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
   width: 100%;
   padding: 11px 14px;
   border: 1px solid var(--border);
@@ -321,6 +321,7 @@ tbody tr:hover { background: var(--paper-100); }
   background: var(--paper-100);
   color: var(--ink-600);
 }
+.field .fixed-value .required-note { color: var(--red-500); font-weight: 700; }
 
 .password-input-wrap { position: relative; }
 .password-input-wrap input { padding-right: 42px; }
