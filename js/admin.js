@@ -474,7 +474,7 @@ function addPrizeFormHtml(category) {
         <input type="text" id="new-prize-emoji" placeholder="Emoji" style="width:70px;">
         <input type="text" id="new-prize-label" placeholder="Label" required style="width:160px;">
         <input type="text" id="new-prize-desc" placeholder="Description" style="width:220px;">
-        <input type="number" step="0.01" id="new-prize-amount" placeholder="Amount USD" value="0" style="width:110px;">
+        <input type="number" step="0.01" id="new-prize-amount" placeholder="Prize" value="0" style="width:110px;">
         <input type="number" step="1" id="new-prize-winners" placeholder="Winners" value="1" style="width:90px;">
         <button type="button" class="btn btn-primary btn-sm" id="save-new-prize-btn">Add</button>
         <button type="button" class="btn btn-sm" id="cancel-new-prize-btn">Cancel</button>
