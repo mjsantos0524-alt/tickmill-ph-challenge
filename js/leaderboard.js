@@ -1,7 +1,7 @@
 async function loadRoiPrizes() {
   const { data, error } = await supabaseClient.from('prizes').select('*').eq('category', 'roi').order('sort_order');
   if (error || !data) return [];
-  return data.map(p => ({ label: `${p.emoji} ${p.label}`, amount: `USD ${Number(p.amount_usd).toLocaleString()} · ${p.description}` }));
+  return data.map(p => ({ label: `${p.emoji} ${p.label}`, amount: `${p.currency === 'PHP' ? '₱' : '$'}${Number(p.amount_usd).toLocaleString()} · ${p.description}` }));
 }
 
 async function loadLeaderboard() {

@@ -1,11 +1,12 @@
-function fmtUsd(n) {
-  return 'USD ' + Number(n).toLocaleString();
+function fmtMoney(n, currency) {
+  const symbol = currency === 'PHP' ? '₱' : '$';
+  return symbol + Number(n).toLocaleString();
 }
 
 function prizeLine(p) {
   const amount = p.winner_count > 1
-    ? `${fmtUsd(p.amount_usd)} each`
-    : fmtUsd(p.amount_usd);
+    ? `${fmtMoney(p.amount_usd, p.currency)} each`
+    : fmtMoney(p.amount_usd, p.currency);
   return `${p.emoji} ${p.label} — ${p.description} (${amount})`;
 }
 
@@ -22,7 +23,7 @@ async function loadHeroPrizes() {
   if (heroRoi) heroRoi.innerHTML = roi.map(p => `<li>${prizeLine(p)}</li>`).join('');
   if (heroRaffle) heroRaffle.innerHTML = raffle.map(p => `<li>${prizeLine(p)}</li>`).join('');
 
-  const budgetRow = p => `<tr><td>${p.emoji} ${p.label}${p.winner_count > 1 ? ' ×' + p.winner_count : ''}</td><td>${fmtUsd(p.amount_usd * p.winner_count)}</td></tr>`;
+  const budgetRow = p => `<tr><td>${p.emoji} ${p.label}${p.winner_count > 1 ? ' ×' + p.winner_count : ''}</td><td>${fmtMoney(p.amount_usd * p.winner_count, p.currency)}</td></tr>`;
 
   const budgetRoiBody = document.getElementById('budget-roi-body');
   const budgetRaffleBody = document.getElementById('budget-raffle-body');

@@ -436,6 +436,12 @@ function prizeRowHtml(p) {
       <td><input type="text" class="f-label" value="${esc(p.label)}"></td>
       <td><input type="text" class="f-desc" value="${esc(p.description)}"></td>
       <td><input type="number" step="0.01" class="f-amount" value="${p.amount_usd}" style="width:100px;"></td>
+      <td>
+        <select class="f-currency" style="width:80px;">
+          <option value="USD" ${p.currency === 'USD' ? 'selected' : ''}>USD</option>
+          <option value="PHP" ${p.currency === 'PHP' ? 'selected' : ''}>PHP</option>
+        </select>
+      </td>
       <td><input type="number" step="1" class="f-winners" value="${p.winner_count}" style="width:70px;"></td>
       <td class="row-actions">
         <button class="btn btn-sm btn-save" data-action="save-prize">Save</button>
@@ -453,7 +459,7 @@ const PRIZE_CATEGORY_BODIES = {
 async function loadPrizes() {
   const { data, error } = await supabaseClient.from('prizes').select('*').order('category').order('sort_order');
   if (error) {
-    document.getElementById('prizes-roi-body').innerHTML = `<tr><td colspan="7">Error: ${esc(error.message)}</td></tr>`;
+    document.getElementById('prizes-roi-body').innerHTML = `<tr><td colspan="8">Error: ${esc(error.message)}</td></tr>`;
     return;
   }
 
@@ -461,7 +467,7 @@ async function loadPrizes() {
     const rows = data.filter(p => p.category === category);
     document.getElementById(bodyId).innerHTML = rows.length
       ? rows.map(prizeRowHtml).join('')
-      : `<tr><td colspan="7" class="loading-row">No prizes yet.</td></tr>`;
+      : `<tr><td colspan="8" class="loading-row">No prizes yet.</td></tr>`;
   });
 }
 
@@ -475,6 +481,10 @@ function addPrizeFormHtml(category) {
         <input type="text" id="new-prize-label" placeholder="Label" required style="width:160px;">
         <input type="text" id="new-prize-desc" placeholder="Description" style="width:220px;">
         <input type="number" step="0.01" id="new-prize-amount" placeholder="Prize" value="0" style="width:110px;">
+        <select id="new-prize-currency" style="width:80px;">
+          <option value="USD" selected>USD</option>
+          <option value="PHP">PHP</option>
+        </select>
         <input type="number" step="1" id="new-prize-winners" placeholder="Winners" value="1" style="width:90px;">
         <button type="button" class="btn btn-primary btn-sm" id="save-new-prize-btn">Add</button>
         <button type="button" class="btn btn-sm" id="cancel-new-prize-btn">Cancel</button>
@@ -497,6 +507,7 @@ document.querySelectorAll('.btn-add-prize').forEach(btn => {
         label,
         description: document.getElementById('new-prize-desc').value.trim(),
         amount_usd: parseFloat(document.getElementById('new-prize-amount').value) || 0,
+        currency: document.getElementById('new-prize-currency').value,
         winner_count: parseInt(document.getElementById('new-prize-winners').value, 10) || 1,
       };
       const { error } = await supabaseClient.from('prizes').insert(payload);
@@ -528,6 +539,7 @@ async function handlePrizeAction(e) {
       label: tr.querySelector('.f-label').value,
       description: tr.querySelector('.f-desc').value,
       amount_usd: parseFloat(tr.querySelector('.f-amount').value),
+      currency: tr.querySelector('.f-currency').value,
       winner_count: parseInt(tr.querySelector('.f-winners').value, 10),
       updated_at: new Date().toISOString(),
     };

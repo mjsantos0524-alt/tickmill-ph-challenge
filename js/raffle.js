@@ -7,7 +7,7 @@ async function loadRafflePrizes() {
     <div class="card">
       <span class="badge ${i === 0 ? 'badge-gold' : 'badge-green'}">${p.label}</span>
       <h3>${p.emoji} ${p.description}</h3>
-      <p>${p.winner_count > 1 ? `USD ${Number(p.amount_usd).toLocaleString()} each · ${p.winner_count} winners` : `Value: USD ${Number(p.amount_usd).toLocaleString()} · 1 winner`}</p>
+      <p>${p.winner_count > 1 ? `${p.currency === 'PHP' ? '₱' : '$'}${Number(p.amount_usd).toLocaleString()} each · ${p.winner_count} winners` : `Value: ${p.currency === 'PHP' ? '₱' : '$'}${Number(p.amount_usd).toLocaleString()} · 1 winner`}</p>
     </div>
   `).join('');
 }
