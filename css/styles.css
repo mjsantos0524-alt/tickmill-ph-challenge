@@ -292,7 +292,9 @@ tbody tr:hover { background: var(--paper-100); }
   color: var(--ink-600);
   font-size: 0.9rem;
 }
-.faq-item.open .faq-a { max-height: 240px; padding-bottom: 16px; }
+.faq-a ul { padding-left: 18px; margin: 6px 0; }
+.faq-a li { margin-bottom: 6px; }
+.faq-item.open .faq-a { max-height: 600px; padding-bottom: 16px; }
 
 /* ---------- Forms ---------- */
 .form-card { max-width: 480px; margin: 0 auto; }
