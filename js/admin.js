@@ -673,7 +673,7 @@ document.getElementById('admin-add-form').addEventListener('submit', async (e) =
   showAdminAddMsg('', '');
 
   const full_name = document.getElementById('admin-name').value.trim();
-  const email = document.getElementById('admin-email').value.trim();
+  const email = document.getElementById('new-admin-email').value.trim();
   // Role is display-only here — "Super Admin" is a disabled option in the
   // dropdown, and the create-admin function ignores this field entirely
   // (it always creates regular admins server-side).
