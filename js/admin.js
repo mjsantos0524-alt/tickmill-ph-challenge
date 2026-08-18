@@ -69,7 +69,7 @@ async function loadRegistrants() {
     supabaseClient.from('trading_accounts').select('registrant_id, account_number').order('created_at'),
   ]);
   const body = document.getElementById('registrants-body');
-  if (error) { body.innerHTML = `<tr><td colspan="8">Error: ${esc(error.message)}</td></tr>`; return; }
+  if (error) { body.innerHTML = `<tr><td colspan="6">Error: ${esc(error.message)}</td></tr>`; return; }
 
   tradingAccountsByRegistrant = {};
   if (!acctError && accounts) {
@@ -87,12 +87,10 @@ async function loadRegistrants() {
       <td>${esc(r.email)}</td>
       <td>${esc(r.account_type)}</td>
       <td>${esc((tradingAccountsByRegistrant[r.id] || []).join(', ') || '—')}</td>
-      <td>${esc(r.referral_code)}</td>
-      <td>${esc(r.referred_by_code || '—')}</td>
       <td>${new Date(r.created_at).toLocaleDateString()}</td>
       <td><button class="btn btn-sm btn-danger" data-action="del-registrant">Delete</button></td>
     </tr>
-  `).join('') : '<tr><td colspan="8" class="loading-row">No registrants yet.</td></tr>';
+  `).join('') : '<tr><td colspan="6" class="loading-row">No registrants yet.</td></tr>';
 }
 
 function populateRegistrantSelects(data) {
