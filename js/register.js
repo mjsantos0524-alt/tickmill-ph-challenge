@@ -4,16 +4,31 @@ function showMsg(text, type) {
   el.className = 'form-msg ' + type;
 }
 
+const MAX_TRADING_ACCOUNTS = 3;
+
+function updateAddAccountBtnState() {
+  const extraCount = document.querySelectorAll('.extra-account-row').length;
+  const addBtn = document.getElementById('add-account-btn');
+  const atLimit = extraCount + 1 >= MAX_TRADING_ACCOUNTS;
+  addBtn.style.display = atLimit ? 'none' : '';
+}
+
 document.getElementById('add-account-btn').addEventListener('click', () => {
   const wrap = document.getElementById('extra-accounts');
+  if (wrap.querySelectorAll('.extra-account-row').length + 1 >= MAX_TRADING_ACCOUNTS) return;
+
   const row = document.createElement('div');
   row.className = 'extra-account-row';
   row.innerHTML = `
     <input type="text" class="extra-account-input" placeholder="e.g. 87654321">
     <button type="button" class="remove-account" title="Remove">×</button>
   `;
-  row.querySelector('.remove-account').addEventListener('click', () => row.remove());
+  row.querySelector('.remove-account').addEventListener('click', () => {
+    row.remove();
+    updateAddAccountBtnState();
+  });
   wrap.appendChild(row);
+  updateAddAccountBtnState();
 });
 
 function collectAccountNumbers() {
