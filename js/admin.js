@@ -1,5 +1,7 @@
 let registrantsCache = [];
 let tradingAccountsByRegistrant = {};
+let currentAdminRole = null;
+let currentUserId = null;
 
 function esc(s) {
   return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -11,18 +13,43 @@ function showLoginMsg(text, type) {
   el.className = 'form-msg ' + (type || '');
 }
 
-function showPanel(loggedIn, email) {
-  document.getElementById('login-screen').style.display = loggedIn ? 'none' : 'block';
-  document.getElementById('admin-panel').style.display = loggedIn ? 'block' : 'none';
-  if (loggedIn) {
-    document.getElementById('admin-email').textContent = email || '';
-    loadAll();
+function showScreen(name) {
+  document.getElementById('login-screen').style.display = name === 'login' ? 'block' : 'none';
+  document.getElementById('suspended-screen').style.display = name === 'suspended' ? 'block' : 'none';
+  document.getElementById('admin-panel').style.display = name === 'panel' ? 'block' : 'none';
+}
+
+async function showPanel(loggedIn, email, userId) {
+  if (!loggedIn) {
+    showScreen('login');
+    return;
   }
+
+  const { data: myAdmin, error } = await supabaseClient
+    .from('admins')
+    .select('role, is_active')
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  if (error || !myAdmin || !myAdmin.is_active) {
+    showScreen('suspended');
+    return;
+  }
+
+  currentAdminRole = myAdmin.role;
+  currentUserId = userId;
+
+  showScreen('panel');
+  document.getElementById('admin-email').textContent = email || '';
+  document.querySelectorAll('.super-only').forEach(el => {
+    el.style.display = currentAdminRole === 'super_admin' ? '' : 'none';
+  });
+  loadAll();
 }
 
 async function checkSession() {
   const { data } = await supabaseClient.auth.getSession();
-  showPanel(!!data.session, data.session?.user?.email);
+  await showPanel(!!data.session, data.session?.user?.email, data.session?.user?.id);
 }
 
 document.getElementById('login-form').addEventListener('submit', async (e) => {
@@ -36,10 +63,15 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
     return;
   }
   showLoginMsg('', '');
-  showPanel(true, data.user?.email);
+  await showPanel(true, data.user?.email, data.user?.id);
 });
 
 document.getElementById('logout-btn').addEventListener('click', async () => {
+  await supabaseClient.auth.signOut();
+  showPanel(false);
+});
+
+document.getElementById('suspended-logout-btn').addEventListener('click', async () => {
   await supabaseClient.auth.signOut();
   showPanel(false);
 });
@@ -60,6 +92,7 @@ function loadAll() {
   loadPrizes();
   loadAnnouncementsAdmin();
   loadCampaignSettings();
+  if (currentAdminRole === 'super_admin') loadAdmins();
 }
 
 // ---------- Registrants ----------
@@ -450,6 +483,100 @@ document.getElementById('settings-form').addEventListener('submit', async (e) =>
 
   if (error) { showSettingsMsg(error.message, 'error'); return; }
   showSettingsMsg('Saved — the Overview page countdown will update.', 'success');
+});
+
+// ---------- Admins (super admin only) ----------
+function showAdminAddMsg(text, type) {
+  const el = document.getElementById('admin-add-msg');
+  el.textContent = text;
+  el.className = 'form-msg ' + (type || '');
+}
+
+async function loadAdmins() {
+  const { data, error } = await supabaseClient.from('admins').select('*').order('created_at');
+  const body = document.getElementById('admins-body');
+  if (error) { body.innerHTML = `<tr><td colspan="6">Error: ${esc(error.message)}</td></tr>`; return; }
+
+  body.innerHTML = data.length ? data.map(a => {
+    const isSelf = a.user_id === currentUserId;
+    return `
+    <tr data-id="${a.id}" data-user-id="${a.user_id}">
+      <td>${esc(a.full_name)}${isSelf ? ' <span class="badge badge-navy">You</span>' : ''}</td>
+      <td>${esc(a.email)}</td>
+      <td>${a.role === 'super_admin' ? 'Super Admin' : 'Admin'}</td>
+      <td>${a.is_active ? '<span class="badge badge-green">Active</span>' : '<span class="badge badge-red">Suspended</span>'}</td>
+      <td>${new Date(a.created_at).toLocaleDateString()}</td>
+      <td class="row-actions">
+        ${isSelf ? '<span style="color:var(--ink-400); font-size:0.82rem;">—</span>' : `
+          <button class="btn btn-sm ${a.is_active ? '' : 'btn-save'}" data-action="toggle-admin">${a.is_active ? 'Suspend' : 'Reactivate'}</button>
+          <button class="btn btn-sm btn-danger" data-action="remove-admin">Remove</button>
+        `}
+      </td>
+    </tr>`;
+  }).join('') : '<tr><td colspan="6" class="loading-row">No admins found.</td></tr>';
+}
+
+document.getElementById('admins-body').addEventListener('click', async (e) => {
+  const action = e.target.dataset.action;
+  if (!action) return;
+  const tr = e.target.closest('tr');
+  const id = tr.dataset.id;
+
+  if (action === 'toggle-admin') {
+    const suspending = e.target.textContent.trim() === 'Suspend';
+    if (!confirm(suspending ? 'Suspend this admin? They will immediately lose access to everything.' : 'Reactivate this admin?')) return;
+    const { error } = await supabaseClient.from('admins').update({ is_active: !suspending }).eq('id', id);
+    if (error) { alert(error.message); return; }
+    loadAdmins();
+  }
+
+  if (action === 'remove-admin') {
+    if (!confirm('Remove this admin entirely? This permanently revokes their access (their login itself is not deleted, but they will never be able to access the dashboard again unless re-added).')) return;
+    const { error } = await supabaseClient.from('admins').delete().eq('id', id);
+    if (error) { alert(error.message); return; }
+    loadAdmins();
+  }
+});
+
+document.getElementById('admin-add-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('admin-add-btn');
+  btn.disabled = true;
+  btn.textContent = 'Creating…';
+  showAdminAddMsg('', '');
+
+  const full_name = document.getElementById('admin-name').value.trim();
+  const email = document.getElementById('admin-email').value.trim();
+  const password = document.getElementById('admin-password').value;
+  const role = document.getElementById('admin-role').value;
+
+  const { data, error } = await supabaseClient.functions.invoke('create-admin', {
+    body: { full_name, email, password, role },
+  });
+
+  btn.disabled = false;
+  btn.textContent = 'Create';
+
+  if (error) {
+    // FunctionsHttpError carries the actual JSON error body on .context (a Response)
+    let message = error.message;
+    try {
+      const body = await error.context.json();
+      if (body?.error) message = body.error;
+    } catch (_) { /* fall back to error.message */ }
+    showAdminAddMsg(message, 'error');
+    return;
+  }
+
+  if (data?.error) {
+    showAdminAddMsg(data.error, 'error');
+    return;
+  }
+
+  showAdminAddMsg('Admin created.', 'success');
+  e.target.reset();
+  document.getElementById('admin-role').value = 'admin';
+  loadAdmins();
 });
 
 checkSession();
