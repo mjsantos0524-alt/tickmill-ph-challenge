@@ -444,17 +444,68 @@ function prizeRowHtml(p) {
     </tr>`;
 }
 
+const PRIZE_CATEGORY_BODIES = {
+  roi: 'prizes-roi-body',
+  raffle: 'prizes-raffle-body',
+  quarterly: 'prizes-quarterly-body',
+};
+
 async function loadPrizes() {
   const { data, error } = await supabaseClient.from('prizes').select('*').order('category').order('sort_order');
-  const roiBody = document.getElementById('prizes-roi-body');
-  const raffleBody = document.getElementById('prizes-raffle-body');
-  if (error) { roiBody.innerHTML = `<tr><td colspan="7">Error: ${esc(error.message)}</td></tr>`; return; }
+  if (error) {
+    document.getElementById('prizes-roi-body').innerHTML = `<tr><td colspan="7">Error: ${esc(error.message)}</td></tr>`;
+    return;
+  }
 
-  const roi = data.filter(p => p.category === 'roi');
-  const raffle = data.filter(p => p.category === 'raffle');
-  roiBody.innerHTML = roi.length ? roi.map(prizeRowHtml).join('') : '<tr><td colspan="7" class="loading-row">No ROI prizes yet.</td></tr>';
-  raffleBody.innerHTML = raffle.length ? raffle.map(prizeRowHtml).join('') : '<tr><td colspan="7" class="loading-row">No raffle prizes yet.</td></tr>';
+  Object.entries(PRIZE_CATEGORY_BODIES).forEach(([category, bodyId]) => {
+    const rows = data.filter(p => p.category === category);
+    document.getElementById(bodyId).innerHTML = rows.length
+      ? rows.map(prizeRowHtml).join('')
+      : `<tr><td colspan="7" class="loading-row">No prizes yet.</td></tr>`;
+  });
 }
+
+function addPrizeFormHtml(category) {
+  return `
+    <div class="card" id="prize-add-form" data-category="${category}" style="margin:12px 0 24px;">
+      <h4 class="mt-0" style="margin-bottom:12px;">New ${esc(category)} prize</h4>
+      <div class="admin-form-row">
+        <input type="number" step="1" id="new-prize-order" placeholder="Order" value="1" style="width:70px;">
+        <input type="text" id="new-prize-emoji" placeholder="Emoji" style="width:70px;">
+        <input type="text" id="new-prize-label" placeholder="Label" required style="width:160px;">
+        <input type="text" id="new-prize-desc" placeholder="Description" style="width:220px;">
+        <input type="number" step="0.01" id="new-prize-amount" placeholder="Amount USD" value="0" style="width:110px;">
+        <input type="number" step="1" id="new-prize-winners" placeholder="Winners" value="1" style="width:90px;">
+        <button type="button" class="btn btn-primary btn-sm" id="save-new-prize-btn">Add</button>
+        <button type="button" class="btn btn-sm" id="cancel-new-prize-btn">Cancel</button>
+      </div>
+    </div>`;
+}
+
+document.querySelectorAll('.btn-add-prize').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const wrap = document.getElementById('prize-add-form-wrap');
+    wrap.innerHTML = addPrizeFormHtml(btn.dataset.category);
+    document.getElementById('cancel-new-prize-btn').addEventListener('click', () => { wrap.innerHTML = ''; });
+    document.getElementById('save-new-prize-btn').addEventListener('click', async () => {
+      const label = document.getElementById('new-prize-label').value.trim();
+      if (!label) { alert('Label is required.'); return; }
+      const payload = {
+        category: btn.dataset.category,
+        sort_order: parseInt(document.getElementById('new-prize-order').value, 10) || 1,
+        emoji: document.getElementById('new-prize-emoji').value.trim(),
+        label,
+        description: document.getElementById('new-prize-desc').value.trim(),
+        amount_usd: parseFloat(document.getElementById('new-prize-amount').value) || 0,
+        winner_count: parseInt(document.getElementById('new-prize-winners').value, 10) || 1,
+      };
+      const { error } = await supabaseClient.from('prizes').insert(payload);
+      if (error) { alert(error.message); return; }
+      wrap.innerHTML = '';
+      loadPrizes();
+    });
+  });
+});
 
 async function handlePrizeAction(e) {
   const action = e.target.dataset.action;
@@ -488,6 +539,7 @@ async function handlePrizeAction(e) {
 
 document.getElementById('prizes-roi-body').addEventListener('click', handlePrizeAction);
 document.getElementById('prizes-raffle-body').addEventListener('click', handlePrizeAction);
+document.getElementById('prizes-quarterly-body').addEventListener('click', handlePrizeAction);
 
 // ---------- Announcements ----------
 async function loadAnnouncementsAdmin() {
