@@ -313,6 +313,12 @@ tbody tr:hover { background: var(--paper-100); }
 .form-msg.error { display: block; background: #fbe6e4; color: #b23327; }
 .form-msg.success { display: block; background: #e2f7ee; color: #0e7a4c; }
 
+.extra-account-row { display: flex; gap: 8px; margin-bottom: 8px; }
+.extra-account-row input { flex: 1; }
+.extra-account-row .remove-account { background: none; border: 1px solid var(--border); border-radius: 8px; color: var(--red-500); font-weight: 700; padding: 0 12px; cursor: pointer; }
+.btn-sm-add { background: none; border: 1px dashed var(--border); font-size: 0.85rem; padding: 9px 16px; border-radius: 8px; cursor: pointer; font-weight: 700; }
+.btn-sm-add:hover { background: var(--paper-100); }
+
 .success-panel { text-align: center; padding: 12px 0; }
 .success-panel .code-box {
   background: var(--navy-950);

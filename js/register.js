@@ -10,6 +10,26 @@ function showMsg(text, type) {
   el.className = 'form-msg ' + type;
 }
 
+document.getElementById('add-account-btn').addEventListener('click', () => {
+  const wrap = document.getElementById('extra-accounts');
+  const row = document.createElement('div');
+  row.className = 'extra-account-row';
+  row.innerHTML = `
+    <input type="text" class="extra-account-input" placeholder="e.g. 87654321">
+    <button type="button" class="remove-account" title="Remove">×</button>
+  `;
+  row.querySelector('.remove-account').addEventListener('click', () => row.remove());
+  wrap.appendChild(row);
+});
+
+function collectAccountNumbers() {
+  const primary = document.getElementById('trading_account_number').value.trim();
+  const extras = Array.from(document.querySelectorAll('.extra-account-input'))
+    .map(i => i.value.trim())
+    .filter(v => v.length > 0);
+  return [primary, ...extras];
+}
+
 document.getElementById('reg-form').addEventListener('submit', async (e) => {
   e.preventDefault();
   const submitBtn = document.getElementById('submit-btn');
@@ -19,7 +39,7 @@ document.getElementById('reg-form').addEventListener('submit', async (e) => {
   const full_name = document.getElementById('full_name').value.trim();
   const email = document.getElementById('email').value.trim();
   const account_type = document.getElementById('account_type').value;
-  const trading_account_number = document.getElementById('trading_account_number').value.trim();
+  const trading_account_numbers = collectAccountNumbers();
   const referred_by_raw = document.getElementById('referral_code').value.trim().toUpperCase();
   const referred_by_code = referred_by_raw.length ? referred_by_raw : null;
 
@@ -28,8 +48,13 @@ document.getElementById('reg-form').addEventListener('submit', async (e) => {
 
   while (attempt < 3) {
     const referral_code = makeReferralCode(full_name);
-    const { error } = await supabaseClient.from('registrants').insert({
-      full_name, email, account_type, trading_account_number, referral_code, referred_by_code
+    const { error } = await supabaseClient.rpc('register_participant', {
+      p_full_name: full_name,
+      p_email: email,
+      p_account_type: account_type,
+      p_trading_account_numbers: trading_account_numbers,
+      p_referral_code: referral_code,
+      p_referred_by_code: referred_by_code,
     });
 
     if (!error) {

@@ -31,7 +31,7 @@ document.getElementById('status-form').addEventListener('submit', async (e) => {
 
   document.getElementById('s-name').textContent = row.full_name;
   document.getElementById('s-account-type').textContent = row.account_type === 'raw' ? 'RAW' : 'Classic';
-  document.getElementById('s-account-number').textContent = row.trading_account_number;
+  document.getElementById('s-account-number').textContent = (row.trading_account_numbers && row.trading_account_numbers.length) ? row.trading_account_numbers.join(', ') : '—';
   document.getElementById('s-referral-code').textContent = row.referral_code;
 
   document.getElementById('s-lots').textContent = row.has_leaderboard_entry ? Number(row.lots_traded).toFixed(1) : '0';

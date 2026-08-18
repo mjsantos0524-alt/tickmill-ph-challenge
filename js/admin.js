@@ -1,4 +1,5 @@
 let registrantsCache = [];
+let tradingAccountsByRegistrant = {};
 
 function esc(s) {
   return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -63,9 +64,19 @@ function loadAll() {
 
 // ---------- Registrants ----------
 async function loadRegistrants() {
-  const { data, error } = await supabaseClient.from('registrants').select('*').order('created_at', { ascending: false });
+  const [{ data, error }, { data: accounts, error: acctError }] = await Promise.all([
+    supabaseClient.from('registrants').select('*').order('created_at', { ascending: false }),
+    supabaseClient.from('trading_accounts').select('registrant_id, account_number').order('created_at'),
+  ]);
   const body = document.getElementById('registrants-body');
   if (error) { body.innerHTML = `<tr><td colspan="8">Error: ${esc(error.message)}</td></tr>`; return; }
+
+  tradingAccountsByRegistrant = {};
+  if (!acctError && accounts) {
+    accounts.forEach(a => {
+      (tradingAccountsByRegistrant[a.registrant_id] ||= []).push(a.account_number);
+    });
+  }
 
   registrantsCache = data;
   populateRegistrantSelects(data);
@@ -75,7 +86,7 @@ async function loadRegistrants() {
       <td>${esc(r.full_name)}</td>
       <td>${esc(r.email)}</td>
       <td>${esc(r.account_type)}</td>
-      <td>${esc(r.trading_account_number || '—')}</td>
+      <td>${esc((tradingAccountsByRegistrant[r.id] || []).join(', ') || '—')}</td>
       <td>${esc(r.referral_code)}</td>
       <td>${esc(r.referred_by_code || '—')}</td>
       <td>${new Date(r.created_at).toLocaleDateString()}</td>
@@ -90,6 +101,14 @@ function populateRegistrantSelects(data) {
   document.getElementById('raffle-registrant').innerHTML = '<option value="">— select registrant —</option>' + opts;
 }
 
+document.getElementById('lb-registrant').addEventListener('change', (e) => {
+  const accounts = tradingAccountsByRegistrant[e.target.value] || [];
+  const select = document.getElementById('lb-trading-account');
+  select.innerHTML = accounts.length
+    ? accounts.map(a => `<option value="${esc(a)}">${esc(a)}</option>`).join('')
+    : '<option value="">— no accounts on file —</option>';
+});
+
 document.getElementById('registrants-body').addEventListener('click', async (e) => {
   if (e.target.dataset.action !== 'del-registrant') return;
   const tr = e.target.closest('tr');
@@ -103,11 +122,17 @@ document.getElementById('registrants-body').addEventListener('click', async (e) 
 async function loadLeaderboard() {
   const { data, error } = await supabaseClient.from('leaderboard_entries').select('*').order('risk_adjusted_score', { ascending: false });
   const body = document.getElementById('lb-body');
-  if (error) { body.innerHTML = `<tr><td colspan="12">Error: ${esc(error.message)}</td></tr>`; return; }
+  if (error) { body.innerHTML = `<tr><td colspan="13">Error: ${esc(error.message)}</td></tr>`; return; }
 
-  body.innerHTML = data.length ? data.map(row => `
+  body.innerHTML = data.length ? data.map(row => {
+    const accounts = tradingAccountsByRegistrant[row.registrant_id] || [];
+    const acctOptions = accounts.length
+      ? accounts.map(a => `<option value="${esc(a)}" ${row.trading_account_number === a ? 'selected' : ''}>${esc(a)}</option>`).join('')
+      : `<option value="${esc(row.trading_account_number || '')}" selected>${esc(row.trading_account_number || '— none —')}</option>`;
+    return `
     <tr data-id="${row.id}">
       <td><input type="text" class="f-alias" value="${esc(row.trader_alias)}"></td>
+      <td><select class="f-trading-account">${acctOptions}</select></td>
       <td><select class="f-account_type"><option value="classic" ${row.account_type==='classic'?'selected':''}>Classic</option><option value="raw" ${row.account_type==='raw'?'selected':''}>RAW</option></select></td>
       <td><input type="number" step="0.01" class="f-deposit" value="${row.initial_deposit}"></td>
       <td><input type="number" step="0.01" class="f-profit" value="${row.net_profit}"></td>
@@ -122,12 +147,13 @@ async function loadLeaderboard() {
         <button class="btn btn-sm btn-danger" data-action="del-lb">Delete</button>
       </td>
       <td><button class="btn btn-sm" data-action="history-lb">History</button></td>
-    </tr>
-  `).join('') : '<tr><td colspan="12" class="loading-row">No leaderboard entries yet.</td></tr>';
+    </tr>`;
+  }).join('') : '<tr><td colspan="13" class="loading-row">No leaderboard entries yet.</td></tr>';
 }
 
 const LB_FIELD_LABELS = {
   trader_alias: 'Alias',
+  trading_account_number: 'Trading Account',
   account_type: 'Account Type',
   initial_deposit: 'Deposit',
   net_profit: 'Net Profit',
@@ -147,7 +173,7 @@ async function toggleLbHistory(tr, id) {
 
   const historyRow = document.createElement('tr');
   historyRow.className = 'lb-history-row';
-  historyRow.innerHTML = `<td colspan="12" class="loading-row">Loading history…</td>`;
+  historyRow.innerHTML = `<td colspan="13" class="loading-row">Loading history…</td>`;
   tr.after(historyRow);
 
   const { data, error } = await supabaseClient
@@ -156,10 +182,10 @@ async function toggleLbHistory(tr, id) {
     .eq('leaderboard_entry_id', id)
     .order('changed_at', { ascending: false });
 
-  if (error) { historyRow.innerHTML = `<td colspan="12">Error: ${esc(error.message)}</td>`; return; }
-  if (!data.length) { historyRow.innerHTML = `<td colspan="12" class="loading-row">No edits recorded for this entry yet.</td>`; return; }
+  if (error) { historyRow.innerHTML = `<td colspan="13">Error: ${esc(error.message)}</td>`; return; }
+  if (!data.length) { historyRow.innerHTML = `<td colspan="13" class="loading-row">No edits recorded for this entry yet.</td>`; return; }
 
-  historyRow.innerHTML = `<td colspan="12"><div class="history-list">${data.map(h => {
+  historyRow.innerHTML = `<td colspan="13"><div class="history-list">${data.map(h => {
     const changes = Object.keys(LB_FIELD_LABELS)
       .filter(k => JSON.stringify(h.old_data[k]) !== JSON.stringify(h.new_data[k]))
       .map(k => `<li><strong>${LB_FIELD_LABELS[k]}:</strong> ${esc(h.old_data[k])} → ${esc(h.new_data[k])}</li>`)
@@ -193,6 +219,7 @@ document.getElementById('lb-body').addEventListener('click', async (e) => {
   if (action === 'save-lb') {
     const payload = {
       trader_alias: tr.querySelector('.f-alias').value,
+      trading_account_number: tr.querySelector('.f-trading-account').value || null,
       account_type: tr.querySelector('.f-account_type').value,
       initial_deposit: parseFloat(tr.querySelector('.f-deposit').value),
       net_profit: parseFloat(tr.querySelector('.f-profit').value),
@@ -213,6 +240,7 @@ document.getElementById('lb-add-form').addEventListener('submit', async (e) => {
   const payload = {
     registrant_id,
     trader_alias: document.getElementById('lb-alias').value,
+    trading_account_number: document.getElementById('lb-trading-account').value || null,
     account_type: document.getElementById('lb-account-type').value,
     initial_deposit: parseFloat(document.getElementById('lb-deposit').value),
     net_profit: parseFloat(document.getElementById('lb-profit').value),
@@ -227,6 +255,7 @@ document.getElementById('lb-add-form').addEventListener('submit', async (e) => {
   document.getElementById('lb-deposit').value = 500;
   document.getElementById('lb-lots').value = 5;
   document.getElementById('lb-weeks').value = 3;
+  document.getElementById('lb-trading-account').innerHTML = '<option value="">— select registrant first —</option>';
   loadLeaderboard();
 });
 
