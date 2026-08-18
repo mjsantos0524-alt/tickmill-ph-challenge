@@ -2,10 +2,31 @@ let registrantsCache = [];
 let tradingAccountsByRegistrant = {};
 let currentAdminRole = null;
 let currentUserId = null;
+let currentPermissions = [];
+
+const PERMISSION_MODULES = [
+  { key: 'registrants', label: 'Registrants' },
+  { key: 'leaderboard', label: 'Leaderboard' },
+  { key: 'raffle', label: 'Raffle' },
+  { key: 'prizes', label: 'Prizes' },
+  { key: 'announcements', label: 'Announcements' },
+  { key: 'settings', label: 'Settings' },
+];
 
 function esc(s) {
   return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
+
+function permChecklistHtml(namePrefix, checked) {
+  return PERMISSION_MODULES.map(m => `
+    <label>
+      <input type="checkbox" class="${namePrefix}-perm" value="${m.key}" ${checked.includes(m.key) ? 'checked' : ''}>
+      ${m.label}
+    </label>
+  `).join('');
+}
+
+document.getElementById('admin-add-permissions').innerHTML = permChecklistHtml('add', []);
 
 function showLoginMsg(text, type) {
   const el = document.getElementById('login-msg');
@@ -27,7 +48,7 @@ async function showPanel(loggedIn, email, userId) {
 
   const { data: myAdmin, error } = await supabaseClient
     .from('admins')
-    .select('role, is_active')
+    .select('role, is_active, permissions')
     .eq('user_id', userId)
     .maybeSingle();
 
@@ -38,12 +59,33 @@ async function showPanel(loggedIn, email, userId) {
 
   currentAdminRole = myAdmin.role;
   currentUserId = userId;
+  currentPermissions = myAdmin.permissions || [];
 
   showScreen('panel');
   document.getElementById('admin-email').textContent = email || '';
   document.querySelectorAll('.super-only').forEach(el => {
     el.style.display = currentAdminRole === 'super_admin' ? '' : 'none';
   });
+
+  const isSuper = currentAdminRole === 'super_admin';
+  let firstVisibleTab = null;
+  document.querySelectorAll('.admin-tab[data-tab]').forEach(tab => {
+    const module = tab.dataset.tab;
+    if (module === 'admins') return; // handled by .super-only above
+    const allowed = isSuper || currentPermissions.includes(module);
+    tab.style.display = allowed ? '' : 'none';
+    if (allowed && !firstVisibleTab) firstVisibleTab = tab;
+  });
+
+  document.getElementById('no-access-msg').style.display = firstVisibleTab ? 'none' : 'block';
+
+  if (firstVisibleTab && !firstVisibleTab.classList.contains('active')) {
+    document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.admin-panel-section').forEach(p => p.style.display = 'none');
+    firstVisibleTab.classList.add('active');
+    document.getElementById('panel-' + firstVisibleTab.dataset.tab).style.display = 'block';
+  }
+
   loadAll();
 }
 
@@ -492,28 +534,42 @@ function showAdminAddMsg(text, type) {
   el.className = 'form-msg ' + (type || '');
 }
 
+function permPillsHtml(a) {
+  if (a.role === 'super_admin') return '<span class="perm-pill">All (Super Admin)</span>';
+  const perms = a.permissions || [];
+  if (!perms.length) return '<span class="perm-pill perm-none">None</span>';
+  return `<div class="perm-pill-row">${perms.map(p => {
+    const mod = PERMISSION_MODULES.find(m => m.key === p);
+    return `<span class="perm-pill">${esc(mod ? mod.label : p)}</span>`;
+  }).join('')}</div>`;
+}
+
 async function loadAdmins() {
   const { data, error } = await supabaseClient.from('admins').select('*').order('created_at');
   const body = document.getElementById('admins-body');
-  if (error) { body.innerHTML = `<tr><td colspan="6">Error: ${esc(error.message)}</td></tr>`; return; }
+  if (error) { body.innerHTML = `<tr><td colspan="7">Error: ${esc(error.message)}</td></tr>`; return; }
 
   body.innerHTML = data.length ? data.map(a => {
     const isSelf = a.user_id === currentUserId;
     return `
-    <tr data-id="${a.id}" data-user-id="${a.user_id}">
+    <tr data-id="${a.id}" data-user-id="${a.user_id}" data-permissions='${JSON.stringify(a.permissions || [])}'>
       <td>${esc(a.full_name)}${isSelf ? ' <span class="badge badge-navy">You</span>' : ''}</td>
       <td>${esc(a.email)}</td>
       <td>${a.role === 'super_admin' ? 'Super Admin' : 'Admin'}</td>
+      <td>${permPillsHtml(a)}</td>
       <td>${a.is_active ? '<span class="badge badge-green">Active</span>' : '<span class="badge badge-red">Suspended</span>'}</td>
       <td>${new Date(a.created_at).toLocaleDateString()}</td>
       <td class="row-actions">
-        ${isSelf ? '<span style="color:var(--ink-400); font-size:0.82rem;">—</span>' : `
+        ${a.role === 'super_admin' ? '<span style="color:var(--ink-400); font-size:0.82rem;">—</span>' : `
+          <button class="btn btn-sm" data-action="edit-perms">Edit Access</button>
+        `}
+        ${isSelf ? '' : `
           <button class="btn btn-sm ${a.is_active ? '' : 'btn-save'}" data-action="toggle-admin">${a.is_active ? 'Suspend' : 'Reactivate'}</button>
           <button class="btn btn-sm btn-danger" data-action="remove-admin">Remove</button>
         `}
       </td>
     </tr>`;
-  }).join('') : '<tr><td colspan="6" class="loading-row">No admins found.</td></tr>';
+  }).join('') : '<tr><td colspan="7" class="loading-row">No admins found.</td></tr>';
 }
 
 document.getElementById('admins-body').addEventListener('click', async (e) => {
@@ -528,11 +584,38 @@ document.getElementById('admins-body').addEventListener('click', async (e) => {
     const { error } = await supabaseClient.from('admins').update({ is_active: !suspending }).eq('id', id);
     if (error) { alert(error.message); return; }
     loadAdmins();
+    return;
   }
 
   if (action === 'remove-admin') {
     if (!confirm('Remove this admin entirely? This permanently revokes their access (their login itself is not deleted, but they will never be able to access the dashboard again unless re-added).')) return;
     const { error } = await supabaseClient.from('admins').delete().eq('id', id);
+    if (error) { alert(error.message); return; }
+    loadAdmins();
+    return;
+  }
+
+  if (action === 'edit-perms') {
+    const existing = tr.nextElementSibling;
+    if (existing && existing.classList.contains('perm-edit-row')) { existing.remove(); return; }
+    document.querySelectorAll('.perm-edit-row').forEach(r => r.remove());
+
+    const checked = JSON.parse(tr.dataset.permissions || '[]');
+    const editRow = document.createElement('tr');
+    editRow.className = 'perm-edit-row';
+    editRow.innerHTML = `<td colspan="7">
+      <div class="perm-checklist">${permChecklistHtml('edit', checked)}</div>
+      <button class="btn btn-sm btn-save" data-action="save-perms">Save Access</button>
+    </td>`;
+    tr.after(editRow);
+    return;
+  }
+
+  if (action === 'save-perms') {
+    const editRow = tr;
+    const dataRow = editRow.previousElementSibling;
+    const selected = Array.from(editRow.querySelectorAll('.edit-perm:checked')).map(cb => cb.value);
+    const { error } = await supabaseClient.from('admins').update({ permissions: selected }).eq('id', dataRow.dataset.id);
     if (error) { alert(error.message); return; }
     loadAdmins();
   }
@@ -552,9 +635,10 @@ document.getElementById('admin-add-form').addEventListener('submit', async (e) =
   // dropdown, and the create-admin function ignores this field entirely
   // (it always creates regular admins server-side).
   const role = document.getElementById('admin-role').value;
+  const permissions = Array.from(document.querySelectorAll('.add-perm:checked')).map(cb => cb.value);
 
   const { data, error } = await supabaseClient.functions.invoke('create-admin', {
-    body: { full_name, email, password, role },
+    body: { full_name, email, password, role, permissions },
   });
 
   btn.disabled = false;
@@ -579,6 +663,7 @@ document.getElementById('admin-add-form').addEventListener('submit', async (e) =
   showAdminAddMsg('Admin created.', 'success');
   e.target.reset();
   document.getElementById('admin-role').value = 'admin';
+  document.querySelectorAll('.add-perm').forEach(cb => cb.checked = false);
   loadAdmins();
 });
 

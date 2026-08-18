@@ -80,6 +80,14 @@
       <button class="admin-tab super-only" data-tab="admins" style="display:none;">Admins</button>
     </div>
 
+    <div id="no-access-msg" class="callout" style="display:none; margin:24px 0;">
+      <span class="icon">🔒</span>
+      <div>
+        <h4>No modules assigned yet</h4>
+        <p>Your account is active but doesn't have access to any tabs yet. Ask your super admin to assign you some permissions.</p>
+      </div>
+    </div>
+
     <!-- Registrants -->
     <div class="admin-panel-section" id="panel-registrants">
       <div class="section-head"><h2>Registrants</h2><p>Everyone who has signed up. Delete removes their leaderboard/raffle records too.</p></div>
@@ -253,13 +261,14 @@
           </select>
           <button type="submit" class="btn btn-primary" id="admin-add-btn">Create</button>
         </form>
-        <div class="hint" style="margin-top:8px;">Super Admin is locked — this account is permanently the only one. New admins are always created as regular Admins, regardless of what's selected here.</div>
+        <div class="perm-checklist" id="admin-add-permissions"></div>
+        <div class="hint">Super Admin is locked — this account is permanently the only one. New admins are always created as regular Admins, regardless of what's selected above. Tick which tabs they can access below.</div>
       </div>
 
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Added</th><th></th></tr></thead>
-          <tbody id="admins-body"><tr><td colspan="6" class="loading-row">Loading…</td></tr></tbody>
+          <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Permissions</th><th>Status</th><th>Added</th><th></th></tr></thead>
+          <tbody id="admins-body"><tr><td colspan="7" class="loading-row">Loading…</td></tr></tbody>
         </table>
       </div>
     </div>

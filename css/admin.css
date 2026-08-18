@@ -81,3 +81,29 @@ table input, table select {
 .history-meta { font-size: 0.76rem; color: var(--ink-400); font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 6px; }
 .history-entry ul { margin: 0; padding-left: 18px; font-size: 0.86rem; }
 .history-entry li { margin-bottom: 2px; }
+
+.perm-checklist { display: flex; flex-wrap: wrap; gap: 12px; margin: 12px 0; }
+.perm-checklist label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: var(--paper-100);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 5px 12px 5px 10px;
+  cursor: pointer;
+}
+.perm-checklist input { margin: 0; }
+
+.perm-pill-row { display: flex; flex-wrap: wrap; gap: 4px; }
+.perm-pill {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #e6ecf7;
+  color: var(--navy-700);
+}
+.perm-pill.perm-none { background: var(--paper-200); color: var(--ink-400); }
