@@ -43,6 +43,28 @@
   </div>
 </section>
 
+<!-- Shown when arriving via an invite email link -->
+<section class="section" id="set-password-screen" style="display:none;">
+  <div class="container">
+    <div class="card form-card">
+      <h2 class="center mt-0">Welcome — Set Your Password</h2>
+      <div id="set-password-msg" class="form-msg"></div>
+      <form id="set-password-form">
+        <div class="field">
+          <label for="new-password">New password</label>
+          <input type="password" id="new-password" required minlength="8">
+          <div class="hint">At least 8 characters.</div>
+        </div>
+        <div class="field">
+          <label for="confirm-password">Confirm password</label>
+          <input type="password" id="confirm-password" required minlength="8">
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" id="set-password-btn">Set Password &amp; Continue</button>
+      </form>
+    </div>
+  </div>
+</section>
+
 <!-- Shown when Supabase Auth login succeeds but the account has no active admin access -->
 <section class="section" id="suspended-screen" style="display:none;">
   <div class="container">
@@ -254,15 +276,14 @@
         <form id="admin-add-form" class="admin-form-row">
           <input type="text" id="admin-name" placeholder="Full name" required style="width:180px;">
           <input type="email" id="admin-email" placeholder="Email" required style="width:200px;">
-          <input type="password" id="admin-password" placeholder="Temp password (min 8 chars)" required minlength="8" style="width:200px;">
           <select id="admin-role">
             <option value="admin">Admin</option>
             <option value="super_admin" disabled title="Locked: only one Super Admin can ever exist">Super Admin (locked)</option>
           </select>
-          <button type="submit" class="btn btn-primary" id="admin-add-btn">Create</button>
+          <button type="submit" class="btn btn-primary" id="admin-add-btn">Send Invite</button>
         </form>
         <div class="perm-checklist" id="admin-add-permissions"></div>
-        <div class="hint">Super Admin is locked — this account is permanently the only one. New admins are always created as regular Admins, regardless of what's selected above. Tick which tabs they can access below.</div>
+        <div class="hint">They'll get an email with a link to set their own password — nobody types or shares a password here. Super Admin is locked — this account is permanently the only one; new admins are always created as regular Admins. Tick which tabs they can access below.</div>
       </div>
 
       <div class="table-wrap">

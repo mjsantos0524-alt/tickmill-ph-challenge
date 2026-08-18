@@ -4,6 +4,10 @@ let currentAdminRole = null;
 let currentUserId = null;
 let currentPermissions = [];
 
+// Captured synchronously before Supabase's client can process/strip it.
+const initialAuthHash = window.location.hash;
+const isInviteLink = initialAuthHash.includes('type=invite') || initialAuthHash.includes('type=recovery');
+
 const PERMISSION_MODULES = [
   { key: 'registrants', label: 'Registrants' },
   { key: 'leaderboard', label: 'Leaderboard' },
@@ -36,6 +40,7 @@ function showLoginMsg(text, type) {
 
 function showScreen(name) {
   document.getElementById('login-screen').style.display = name === 'login' ? 'block' : 'none';
+  document.getElementById('set-password-screen').style.display = name === 'set-password' ? 'block' : 'none';
   document.getElementById('suspended-screen').style.display = name === 'suspended' ? 'block' : 'none';
   document.getElementById('admin-panel').style.display = name === 'panel' ? 'block' : 'none';
 }
@@ -89,10 +94,49 @@ async function showPanel(loggedIn, email, userId) {
   loadAll();
 }
 
+function showSetPasswordMsg(text, type) {
+  const el = document.getElementById('set-password-msg');
+  el.textContent = text;
+  el.className = 'form-msg ' + (type || '');
+}
+
 async function checkSession() {
   const { data } = await supabaseClient.auth.getSession();
+
+  if (isInviteLink && data.session) {
+    showScreen('set-password');
+    return;
+  }
+
   await showPanel(!!data.session, data.session?.user?.email, data.session?.user?.id);
 }
+
+document.getElementById('set-password-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const password = document.getElementById('new-password').value;
+  const confirmPassword = document.getElementById('confirm-password').value;
+
+  if (password !== confirmPassword) {
+    showSetPasswordMsg('Passwords do not match.', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('set-password-btn');
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+
+  const { data, error } = await supabaseClient.auth.updateUser({ password });
+
+  btn.disabled = false;
+  btn.textContent = 'Set Password & Continue';
+
+  if (error) {
+    showSetPasswordMsg(error.message, 'error');
+    return;
+  }
+
+  await showPanel(true, data.user?.email, data.user?.id);
+});
 
 document.getElementById('login-form').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -625,12 +669,11 @@ document.getElementById('admin-add-form').addEventListener('submit', async (e) =
   e.preventDefault();
   const btn = document.getElementById('admin-add-btn');
   btn.disabled = true;
-  btn.textContent = 'Creating…';
+  btn.textContent = 'Sending Invite…';
   showAdminAddMsg('', '');
 
   const full_name = document.getElementById('admin-name').value.trim();
   const email = document.getElementById('admin-email').value.trim();
-  const password = document.getElementById('admin-password').value;
   // Role is display-only here — "Super Admin" is a disabled option in the
   // dropdown, and the create-admin function ignores this field entirely
   // (it always creates regular admins server-side).
@@ -638,11 +681,11 @@ document.getElementById('admin-add-form').addEventListener('submit', async (e) =
   const permissions = Array.from(document.querySelectorAll('.add-perm:checked')).map(cb => cb.value);
 
   const { data, error } = await supabaseClient.functions.invoke('create-admin', {
-    body: { full_name, email, password, role, permissions },
+    body: { full_name, email, role, permissions },
   });
 
   btn.disabled = false;
-  btn.textContent = 'Create';
+  btn.textContent = 'Send Invite';
 
   if (error) {
     // FunctionsHttpError carries the actual JSON error body on .context (a Response)
@@ -660,7 +703,7 @@ document.getElementById('admin-add-form').addEventListener('submit', async (e) =
     return;
   }
 
-  showAdminAddMsg('Admin created.', 'success');
+  showAdminAddMsg('Invite sent — they\'ll get an email to set their password. Delivery can take a few minutes.', 'success');
   e.target.reset();
   document.getElementById('admin-role').value = 'admin';
   document.querySelectorAll('.add-perm').forEach(cb => cb.checked = false);
